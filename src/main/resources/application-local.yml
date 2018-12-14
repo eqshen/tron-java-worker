@@ -1,0 +1,13 @@
+tron:
+  config:
+    netType: TESTNET
+    rpcVersion: 2
+    fullNode:  grpc.shasta.trongrid.io:50051
+    solidityNode: grpc.shasta.trongrid.io:50052
+    eventServer: https://api.shasta.trongrid.io
+
+
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false

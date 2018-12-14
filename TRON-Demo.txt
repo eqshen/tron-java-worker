@@ -1,0 +1,97 @@
+TRON network中，一共有4种节点分别为：
+
+	Witness：作为超级节点，负责收集网络中的交易，负责出块，不为客户端暴露API。
+
+	FullNode：Full Node广播交易和区块，同时为提供的API进行账户，交易和区块的查询和操作。
+				在本例中，端口8090为其HTTP接口，端口50051为其GRPC接口。
+
+	SolidityNode：SolidityNode只负责从FullNodo中拉取区块数据，不会主动发送数据，
+					其区块数据落后于FullNode几个区块，故其暴露的API适合已经确认的交易。客户端需要同时和FullNode和SolidityNode想链接，以获得不同的API功能。其具体API列表在这里。在本例中，端口8091为其HTTP接口，端口50052为其GRPC接口。
+					
+	EventSever: 在TRON的合约中，像Ehereum一样支持事件，不同的是，TRON中的事件是从
+			EventServer中来监听。在本例中，端口8092为其HTTP接口。
+
+
+地址创建：
+	离线创建，算法步骤如下：
+		- Generate a key pair and extract the public key (a 64-byte byte array representing its x,y coordinates).
+		- Hash the public key using sha3-256 function and extract the last 20 bytes of the result.
+		- Add 41 to the beginning of the byte array. Length of the initial address should be 21 bytes.
+		- Hash the address twice using sha256 function and take the first 4 bytes as verification code.
+		- Add the verification code to the end of the initial address and get an address in base58check format through base58 encoding.
+		- An encoded Mainnet address begins with T and is 34 bytes in length.
+
+		Please note: the sha3 protocol adopted is KECCAK-256.
+	离线创建的地址在链上查不到，上链需要有以下3中操作之一。
+		- Directly call the Create Account API
+		- Transfer TRX to the new address
+		- Transfer any kind of token to the new address
+
+		Creating an account burns 0.1 TRX from the creator, or consumes the bandwidth acquired by freezing.
+
+API
+https://developers.tron.network/v3.0/reference
+
+NetWork INfO - like infura
+https://developers.tron.network/lang-zh-Hans/docs/tron-grid-intro
+
+Test Net explorer
+https://explorer.shasta.trongrid.io/
+
+
+
+-----------
+1.基础概念介绍
+	- Bandwidth Points: 
+		Bandwidth points 是一个账户可用于写操作的字节数。
+		为了保障网络的流畅和效率，每个账户在24小时内，有5000点的免费 Bandwidth Points用于消耗。一次交易大概200bytes.
+		一个账户每天可以免费发起大约25个交易。
+		
+		想要获得更多的Bandwidth Points，有两种方式：
+			1）锁仓冻结trx.
+			2) 通过trx购买。
+
+		发送交易是，Transactions以字节数组的方式保存，消耗的point 等于数组的长度。
+
+		在任意的时间段内，整个网络的Bandwidth 是固定的，单个账户锁仓trx获取的Bandwidth points是变动的；
+			例如，如果整个网络上的冻结trx总计10w个， 一个给定帐户冻结了1000个 TRX（冻结TRX总数的1％），则该账户拥有的Bandwidth points 也大概是 总的Bandwidth 的 1%.
+
+		三种消耗：
+			Normal Transaction：
+				1）消耗交易发起人通过冻结资产获得的带宽点数。 如果积分不足，请转到下一步。
+				2）消耗交易发起人 拥有的免费点数
+				3）消耗交易发起者的trx，calculated as the number of bytes in the transaction * 10 SUN
+				大约是0.002 TRX
+
+			New Account Transaction：
+				创建账户时
+				1）消耗交易发起人通过冻结资产获得的带宽点数。 如果积分不足，请转到下一步。
+				2）消耗交易发起人 0.1 trx来创建。
+
+			Token Transfer
+				1) 验证已发布的token的免费带宽点数是否充足，验证事务发起者的免费带宽点是否充足，
+					验证token发行者 已冻结获得的带宽点是否足够，如果任意条件满足，则 从 token的发行者中扣除带宽点数。
+					否则执行下一步
+				2）消耗交易发起人通过冻结资产获得的带宽点数。 如果积分不足，请转到下一步。
+				3）消耗交易发起人 拥有的免费点数
+				4）消耗交易发起者的trx，calculated as the number of bytes in the transaction * 10 SUN
+				
+		一种特殊情况，如果transfer  的to address在链上是新账户（未进行过上链操作），则先执行创建账户操作，然后执行transfer
+		并只收取创建账户的费用，tranfer动作不再消耗费用。
+
+	- Energy
+		创建智能合约需要消耗energy,冻结trx可以获得energy
+		冻结一笔trx只能用于获取energy或bandwidth中的一种。
+		参 https://developers.tron.network/lang-zh-Hans/v3.0/docs/energy
+
+		
+
+	- TRC10 & TRC20, ERC223 ...,  https://developers.tron.network/lang-zh-Hans/v3.0/docs/trc10-token
+
+
+2.常用工具（开发工具）
+3.测试链交互
+	- 查询可用带宽点数
+		/wallet/getaccountnet
+	- 拉取区块和transaction数据
+	- 发送交易
