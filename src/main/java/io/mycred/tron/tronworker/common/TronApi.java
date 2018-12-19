@@ -12,6 +12,7 @@ import io.mycred.tron.tronworker.model.AddressKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.tron.api.GrpcAPI;
 import org.tron.protos.Protocol;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +34,8 @@ public class TronApi {
     }
 
 
-    public Protocol.Block getBlockByNumber(long blockNumber){
-        return grpcClient.getBlock(blockNumber);
+    public GrpcAPI.BlockExtention getBlockByNumber(long blockNumber){
+        return grpcClient.getBlock2(blockNumber);
     }
 
 

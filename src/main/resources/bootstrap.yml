@@ -10,4 +10,4 @@ spring:
 #      password: ${CONFIG_SERVICE_PASSWORD}
 #      username: user
 server:
-  port: 9093
+  port: 80

@@ -1,13 +1,28 @@
 tron:
   config:
-    netType: TESTNET
+    netType: MAINNET
     rpcVersion: 2
     fullNode:  grpc.shasta.trongrid.io:50051
     solidityNode: grpc.shasta.trongrid.io:50052
     eventServer: https://api.shasta.trongrid.io
+
+#tron:
+#  config:
+#    netType: TESTNET
+#    rpcVersion: 2
+#    fullNode:  localhost:50051
+#    solidityNode: localhost:50052
+#    eventServer: localhost:50053
 
 
 eureka:
   client:
     fetch-registry: false
     register-with-eureka: false
+
+
+spring:
+  mvc:
+    view:
+      suffix: .html
+      prefix: /
